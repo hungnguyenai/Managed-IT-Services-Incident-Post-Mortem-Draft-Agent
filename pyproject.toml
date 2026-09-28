@@ -1,0 +1,50 @@
+[project]
+name = "svc-c2-101"
+version = "0.1.0"
+description = "Managed IT Services Incident Post-Mortem Draft Agent — AgentCore Template"
+requires-python = ">=3.11"
+# The framework (agenticstar-agentcore) is NOT a public-PyPI dependency; it is
+# provided by CI per repo arm — a stub package on PYTHONPATH,
+# or installed from the package registry for wheel-era repos (see the dual-mode
+# run-tests CI job). Pinning it here would make `pip install -e .`
+# fail because it is not resolvable from the default index.
+dependencies = [
+    "agenticstar-agentcore[marketplace,openai]==1.0.3",]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==9.0.3",
+    "pytest-cov==5.0.0",
+    "pytest-asyncio==1.4.0",
+    "ruff==0.4.4",
+    "mypy==1.10.0",
+]
+
+[build-system]
+requires = ["setuptools==68.0.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+# disallow_subclassing_any is a per-FILE flag (it fires based on the module being
+# checked, not the base class's module), so it cannot be scoped to framework.*/
+# shared.* via [[tool.mypy.overrides]] below -- every src/ file that subclasses
+# FunctionNode/AgentBaseGraph/AgentState (the whole L1-direct-inheritance
+# architecture) would still trip it. Disabled globally; every other strict flag
+# (disallow_untyped_defs, disallow_any_generics, warn_return_any, ...) stays on.
+disallow_subclassing_any = false
+
+# The agenticstar-agentcore wheel does not ship a py.typed marker, so mypy can't
+# resolve real types for framework.*/shared.* — every symbol from those packages
+# is implicitly Any. ignore_missing_imports (which IS resolved by the imported
+# module, unlike disallow_subclassing_any above) silences the resulting
+# [import-untyped] noise. This does not weaken checking of this template's own
+# code — every other strict flag stays on for src/.
+[[tool.mypy.overrides]]
+module = ["framework.*", "shared.*"]
+ignore_missing_imports = true

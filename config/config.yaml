@@ -1,0 +1,13 @@
+# Runtime parameters.
+# The static registry manifest lives in config/agent.yaml; every runtime-tunable
+# parameter belongs here (moved out of the legacy agent.yaml `agent.config` block
+# — AgentRegistry loads this file separately as Graph(config=...)).
+
+max_retry: 3
+timeout_s: 30
+
+# kb_client: injected in production (template-owned system-architecture +
+# prior-incident-history index); absent -> deterministic fallback corpus in
+# src/services/service.py.
+kb_client: null
+s3_gate_enabled: true
